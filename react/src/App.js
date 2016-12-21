@@ -15,7 +15,6 @@ class App extends Component {
 
     fetchAPI('/counters')
       .then(counters => {
-        console.log('counters', counters)
         this.setState({ counters })
       })
       .catch(error => {
