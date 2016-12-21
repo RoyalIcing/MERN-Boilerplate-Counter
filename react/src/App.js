@@ -40,6 +40,19 @@ class App extends Component {
         }))
       })
   }
+
+  onAddCounter() {
+    fetchAPI(`/counters`, {
+      method: 'POST'
+    })
+      .then(newCounter => {
+        this.setState(({ counters }) => ({
+          // Transform counters, replacing the changed counter,
+          // which has an `_id` of the passed `id`.
+          counters: counters.concat(newCounter)
+        }))
+      })
+  }
   
   render() {
     const { counters } = this.state
@@ -56,6 +69,7 @@ class App extends Component {
           )
         })
       }
+        <button onClick={ this.onAddCounter.bind(this) }>Add</button>
       </main>
     );
   }
