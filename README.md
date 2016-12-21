@@ -13,8 +13,8 @@ MONGO_URL=mongodb://localhost/test
 
 Create `react/.env` file:
 ```
-NODE_ENV=development
-API_URL=http://localhost:3001
+REACT_APP_API_URL=http://localhost:3001
+REACT_APP_SOMETHING_ELSE=1
 ```
 
 ## Run
