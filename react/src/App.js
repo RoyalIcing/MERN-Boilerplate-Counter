@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import 'whatwg-fetch'; // Polyfills window.fetch
-import logo from './logo.svg';
+import fetchAPI from './api/fetchAPI'
+import replaceItemWithID from './utils/replaceItemWithID'
+import Counter from './components/Counter'
 import './App.css';
 
 class App extends Component {
@@ -8,38 +10,53 @@ class App extends Component {
     super(props);
     
     this.state = {
-      count: 3
+      counters: []
     };
 
-    fetch('http://localhost:3001/counter')
-      .then(res => res.json())
-      .then(json => {
-        this.setState({
-          count: json.count
-        })
+    fetchAPI('/counters')
+      .then(counters => {
+        console.log('counters', counters)
+        this.setState({ counters })
       })
       .catch(error => {
         console.error('Error loading counter api', error.message)
       })
   }
   
-  onChangeCount(change) {
-    this.setState({
-      count: this.state.count + change
-    });
-    /*
-    this.setState((previousState) => ({
-      count: previousState + change
-    }));
-    */
+  onChangeCount(id, change) {
+    fetchAPI(`/counters/${ id }`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        change: change
+      })
+    })
+      .then(newCounter => {
+        this.setState(({ counters }) => ({
+          // Transform counters, replacing the changed counter,
+          // which has an `_id` of the passed `id`.
+          counters: replaceItemWithID(counters, id, newCounter)
+        }))
+      })
   }
   
   render() {
+    const { counters } = this.state
     return (
       <main className="App">
-        <button onClick={ this.onChangeCount.bind(this, 1) }>+</button>
-        <button onClick={ this.onChangeCount.bind(this, -1) }>−</button>
-        <h2>{ this.state.count }</h2>
+      {
+        counters.map((counter, index) => {
+          return (
+            <Counter key={ index }
+              count={ counter.count }
+              onIncrement={ this.onChangeCount.bind(this, counter._id, 1) }
+              onDecrement={ this.onChangeCount.bind(this, counter._id, -1) }
+            />
+          )
+        })
+      }
       </main>
     );
   }
