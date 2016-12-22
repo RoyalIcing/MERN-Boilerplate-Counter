@@ -47,3 +47,23 @@ cd react
 npm install
 npm start
 ```
+
+## Deploying
+
+### API
+
+```
+cd api
+now -e MONGO_URL=mongodb://USERNAME:PASSWORD@ACCOUNT.mlab.com:41078/staging -e NODE_ENV=production
+```
+
+Copy the URL to be used below.
+
+### React
+
+```
+cd react
+REACT_APP_API_URL=__YOUR_NOW_API_URL__ npm run build
+cd build
+now
+```
