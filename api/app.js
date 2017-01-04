@@ -1,20 +1,25 @@
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV == null) {
   require('dotenv').config(); // Load .env
 }
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var cors = require('cors');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const cors = require('cors');
+const passport = require('passport');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-var counterRouter = require('./routes/counter');
-var countersRouter = require('./routes/counters');
+const User = require('./models/User');
 
-var app = express();
+const index = require('./routes/index');
+const auth = require('./routes/auth');
+const users = require('./routes/users');
+const counterRouter = require('./routes/counter');
+const countersRouter = require('./routes/counters');
+
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,13 +30,23 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: process.env.SESSION_SECRET }));
 app.use(cors({
   origin: '*'
 }));
 
+// Passport + User
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+// Express + Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', index);
+app.use('/auth', auth);
 //app.use('/users', users);
 app.use('/counter', counterRouter);
 app.use('/counters', countersRouter);
