@@ -1,4 +1,4 @@
-# Counters
+# MongoDB + Express + React + Node + 💖
 
 ## Set up
 
