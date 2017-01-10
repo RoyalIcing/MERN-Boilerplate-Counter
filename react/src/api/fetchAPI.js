@@ -3,6 +3,10 @@ export default function fetchAPI(path, options) {
       .then(response => {
         // Successful
         if (response.ok) {
+          // No content
+          if (response.status === 204) {
+            return Promise.resolve({})
+          }
           // Decode JSON
           return response.json()
         }
