@@ -15,8 +15,6 @@ const User = require('./models/User');
 
 const index = require('./routes/index');
 const auth = require('./routes/auth');
-const users = require('./routes/users');
-const counterRouter = require('./routes/counter');
 const countersRouter = require('./routes/counters');
 
 const app = express();
@@ -47,8 +45,6 @@ app.use(passport.session());
 
 app.use('/', index);
 app.use('/auth', auth);
-//app.use('/users', users);
-app.use('/counter', counterRouter);
 app.use('/counters', countersRouter);
 
 // catch 404 and forward to error handler
