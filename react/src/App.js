@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import 'whatwg-fetch'; // Polyfills window.fetch
 import fetchAPI from './api/fetchAPI'
+import { fetchCurrentUser } from './api/auth'
 import replaceItemWithID from './utils/replaceItemWithID'
 import Counter from './components/Counter'
+import SignInForm from './components/Auth/SignInForm'
 import './App.css';
 
 class App extends Component {
@@ -10,8 +12,26 @@ class App extends Component {
     super(props);
     
     this.state = {
+      // We first check with the API if a user is signed in
+      needsToCheckSignIn: true,
+      currentUser: null,
       counters: []
     };
+
+    this.onUserSignedIn = this.onUserSignedIn.bind(this);
+
+    fetchCurrentUser()
+      .then(user => {
+        this.setState({
+          needsToCheckSignIn: false,
+          currentUser: user
+        })
+      })
+      .catch(error => {
+        this.setState({
+          needsToCheckSignIn: false
+        })
+      })
 
     fetchAPI('/counters')
       .then(counters => {
@@ -53,11 +73,25 @@ class App extends Component {
         }))
       })
   }
+
+  onUserSignedIn(user) {
+    this.setState({ currentUser: user })
+  }
   
   render() {
-    const { counters } = this.state
+    const { needsToCheckSignIn, currentUser, counters } = this.state
+
     return (
       <main className="App">
+      {
+        needsToCheckSignIn ? (
+          <p>Loading…</p>
+        ) : currentUser ? (
+          currentUser.email
+        ) : (
+          <SignInForm onUserSignedIn={ this.onUserSignedIn } />
+        )
+      }
       {
         counters.map((counter, index) => {
           return (
