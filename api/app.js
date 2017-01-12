@@ -1,5 +1,3 @@
-console.log('process.env.NODE_ENV', process.env.NODE_ENV)
-
 if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV == null) {
   require('dotenv').config(); // Load .env
 }
@@ -9,7 +7,6 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const session = require('express-session');
 const cors = require('cors');
 const passport = require('passport');
 
@@ -30,9 +27,8 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser(process.env.SESSION_SECRET));
+//app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: process.env.SESSION_SECRET }));
 app.use(cors({
   origin: '*'
 }));
@@ -43,7 +39,6 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 // Express + Passport
 app.use(passport.initialize());
-app.use(passport.session());
 
 app.use('/', index);
 app.use('/auth', auth);
