@@ -1,4 +1,16 @@
-export default function fetchAPI(path, options) {
+import { readToken } from './jwt'
+
+export default function fetchAPI(path, options = {}) {
+    const token = readToken()
+    if (token) {
+      // Pass token by adding Authorization to headers
+      options = Object.assign({
+        headers: Object.assign({}, options.headers, {
+          Authorization: `JWT ${ token }`
+        })
+      }, options)
+    }
+
     return fetch(process.env.REACT_APP_API_URL + path, options)
       .then(response => {
         // Successful

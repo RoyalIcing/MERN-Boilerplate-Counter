@@ -22,12 +22,14 @@ class App extends Component {
 
     fetchCurrentUser()
       .then(user => {
+        console.log('User', user)
         this.setState({
           needsToCheckSignIn: false,
           currentUser: user
         })
       })
       .catch(error => {
+        console.error('no user', error)
         this.setState({
           needsToCheckSignIn: false
         })
