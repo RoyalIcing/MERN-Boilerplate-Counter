@@ -10,21 +10,21 @@ function whitelistUser({ email }) {
     return { email };
 }
 
+function makeTokenForUser(user) {
+    return jwt.sign({
+        user: whitelistUser(user)
+    }, process.env.TOKEN_SECRET, {
+        subject: user._id.toString(),
+        expiresIn: '5 days'
+    });
+}
+
 // Sign in
 router.post('/signin',
     passport.authenticate('local', { failWithError: true }),
     function(req, res) {
-        const { user } = req
-        const token = jwt.sign({
-            user: whitelistUser(user)
-        }, process.env.TOKEN_SECRET, {
-            subject: user._id.toString(),
-            expiresIn: '5 days'
-        });
-        res.json({
-            token//,
-            //user: whitelistUser(req.user)
-        });
+        const token = makeTokenForUser(req.user)
+        res.json({ token });
     }
 );
 
@@ -48,25 +48,16 @@ router.post('/register', function(req, res, next) {
   User.register(
       new User({ email: email }),
       password,
-      (error) => {
+      (error, user) => {
           if (error) {
               next(error);
           }
           else {
-              res.json({
-                  success: true
-              });
+              const token = makeTokenForUser(user)
+              res.json({ token });
           }
       }
   );
-});
-
-// Sign out
-router.post('/signout', function(req, res) {
-  req.logout();
-  res.json({
-      success: true
-  });
 });
 
 module.exports = router;
