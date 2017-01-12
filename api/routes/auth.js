@@ -18,7 +18,8 @@ router.post('/signin',
         const token = jwt.sign({
             user: whitelistUser(user)
         }, process.env.TOKEN_SECRET, {
-            subject: user._id.toString()
+            subject: user._id.toString(),
+            expiresIn: '5 days'
         });
         res.json({
             token//,
