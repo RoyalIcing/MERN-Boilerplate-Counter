@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
+const passportJWT = require('passport-jwt');
 
 const User = require('./models/User');
 
@@ -37,6 +38,19 @@ app.use(cors({
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+// Passport + JWT
+passport.use(new passportJWT.Strategy(
+  {
+    jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeader(),
+    secretOrKey: process.env.TOKEN_SECRET
+  },
+  (payload, done) => {
+    /*done(null, {
+      _id: payload.sub
+    })*/
+    User.findById(payload.sub, done);
+  }
+));
 // Express + Passport
 app.use(passport.initialize());
 

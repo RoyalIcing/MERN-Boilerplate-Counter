@@ -7,7 +7,7 @@
 Create `api/.env` file:
 ```
 MONGO_URL=mongodb://localhost/test
-SESSION_SECRET=__REMEMBER_TO_CHANGE_THIS__
+TOKEN_SECRET=__REMEMBER_TO_CHANGE_THIS__
 ```
 
 ### React Front-end

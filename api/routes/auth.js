@@ -1,6 +1,8 @@
 const express = require('express');
 const passport = require('passport');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const requireAuthorizedUser = require('../middleware/requireAuthorizedUser');
 
 const router = express.Router();
 
@@ -12,20 +14,32 @@ function whitelistUser({ email }) {
 router.post('/signin',
     passport.authenticate('local', { failWithError: true }),
     function(req, res) {
-        res.json(whitelistUser(req.user));
+        const { user } = req
+        const token = jwt.sign({
+            user: whitelistUser(user)
+        }, process.env.TOKEN_SECRET, {
+            subject: user._id.toString()
+        });
+        res.json({
+            token//,
+            //user: whitelistUser(req.user)
+        });
     }
 );
 
 // Get current user’s info
-router.get('/', function(req, res) {
-  const { user } = req;
-    if (user) {
-        res.json(whitelistUser(user));
+router.get('/',
+    requireAuthorizedUser,
+    function(req, res) {
+        const { user } = req;
+        if (user) {
+            res.json(whitelistUser(user));
+        }
+        else {
+            res.status(401).json({ message: 'Please sign in' });
+        }
     }
-    else {
-        res.status(401).json({ message: 'Please sign in' });
-    }
-});
+);
 
 // Sign up
 router.post('/register', function(req, res, next) {
